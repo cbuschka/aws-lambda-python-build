@@ -1,21 +1,24 @@
 #PROJECT_DIR := $(dir $(firstword $(MAKEFILE_LIST)))
 PROJECT_DIR := $(shell pwd)
+BUILD_NO := $(shell date +'%Y%m%d%H%M%S')
 
-define frobnicate =
-	@echo "frobnicating target $@"
-	frob-step-1 $< -o $@-step-1
-	frob-step-2 $@-step-1 -o $@
+define build_lambda =
+	echo "Building lambda ${1}..."
+	docker build -f ${PROJECT_DIR}/build/Dockerfile -t pybuild-build:${BUILD_NO} ${PROJECT_DIR}/lambda/${1}/
+	rm -rf ${PROJECT_DIR}/target/${1} && mkdir -p ${PROJECT_DIR}/target/${1}
+	docker run -u $(shell id -u):$(shell id -g) -ti --rm \
+		-v ${PROJECT_DIR}/target/${1}:/target:rw \
+		pybuild-build:${BUILD_NO}
+	docker rmi pybuild-build:${BUILD_NO}
 endef
 
-build:	__init
-	docker build -f ${PROJECT_DIR}/build/Dockerfile -t aws-lambda-python37:latest ${PROJECT_DIR}/build/
-	rm -rf ${PROJECT_DIR}/target/example
-	mkdir -p ${PROJECT_DIR}/target/example
-	docker run -u $(shell id -u):$(shell id -g) --init -ti --rm \
-		-v ${HOME}/.cache/pip/:/.cache/pip/:rw \
-		-v ${PROJECT_DIR}/lambda/example:/src:ro \
-		-v ${PROJECT_DIR}/target/example:/target:rw \
-		aws-lambda-python37:latest
+build:	example example2
+
+example:	__init
+	$(call build_lambda,example)
+
+example2:	__init
+	$(call build_lambda,example2)
 
 __init:
 	echo "Init..."
