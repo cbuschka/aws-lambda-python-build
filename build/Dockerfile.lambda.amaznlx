@@ -1,0 +1,17 @@
+FROM amazonlinux:2018.03
+RUN yum update -y && \
+    yum -y install git \
+    python36 \
+    python36-pip \
+    zip \
+    && yum clean all
+RUN pip-3.6 install boto3
+
+RUN useradd -u 1000 -m -s /bin/bash build && \
+	mkdir /build && \
+	chown build.build /build
+USER build
+WORKDIR /build
+RUN python3.6 -m venv venv/
+COPY requirements.txt /build/target/
+RUN pip3.6 install -r requirements.txt
