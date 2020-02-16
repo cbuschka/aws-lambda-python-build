@@ -2,13 +2,23 @@
 
 ### Ingredients
 * multi stage docker build
+  - caches interim results
 * precompiling to .pyc files
+  - improves aws lambda startup time
 * packaging with dependencies as zip
+  - self contained package
+  - also contains uptodate boto3
 
 ### Build
 ```
 make
 ```
+
+### Todo
+* run tests on build
+* integration test with package
+* coverage
+* use awslinux
 
 ### License
 Written by [Cornelius Buschka](https://github.com/cbuschka).
