@@ -16,7 +16,8 @@ FROM deps
 COPY --from=deps /build/package/ /build/package/
 COPY / /build/package/
 WORKDIR /build/package
-RUN ls -lah /build/package/ \
+RUN python -m compileall -b \
+	&& ls -lah /build/package/ \
 	&& zip -r9q /build/package.zip . --recurse-paths -i '*' --exclude 'requirements*.txt'
 VOLUME /target
 
