@@ -15,9 +15,7 @@ make
 ```
 
 ### Todo
-* run tests on build
 * integration test with package
-* coverage
 * use awslinux
 
 ### License
